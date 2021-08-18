@@ -234,6 +234,7 @@ const mutations = {
   setTodos: (state, todos) => (state.todos = todos),
   addTodo: (state, todo) => state.todos.unshift(todo),
   // Eliminamos la tarea con el id que va a recibir
+  // filtramos y retornamos tan solo los que no tienen el id que se le pasa
   removeTodo: (state, id) => state.todos = state.todos.filter(todo => todo.id !== id),
 };
 ```
@@ -267,3 +268,184 @@ export default {
 - En este caso, para filtrar una tarea, podríamos utilizar props y emit para buscar las tareas completadas, pero si hay muchos componentes anidados, esto puede ser bastante molesto, y en este caso Vuex es de gran ayuda. 
 
 - Empezamos por crear un componente para filtrar en nuestra carpeta de componentes, al que llamaremos `FilterTodos.vue`:
+```html
+<template>
+  <div>
+    Filtrar tareas
+    <select>
+      <option value="100">100</option>
+      <option value="50">50</option>
+      <option value="20">20</option>
+      <option value="10">10</option>
+      <option value="5">5</option>
+    </select>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "FilterTodos",
+}
+</script>
+
+<style>
+select {
+  margin-top: 20px;
+  padding: 6px;
+  border: 1px solid #3eb37f;
+  width: 65px;
+}
+
+</style>
+```
+- En la API de JSONPlaceholder, podemos hacer una request de un número determinado de tareas, pasando el parámetro `?_limit=numero`, por ejemplo `https://jsonplaceholder.typicode.com/todos?_limit=5` nos devolvería 5 tareas.
+- En nuestro archivo del módulo del store de `todos.js` crearemos una acción que pida 5 tareas y en ved de crear otra mutación, reutilizaremos la que ya tenemos de `setTodos` puesto que ésta recibe un número de tareas para modificar el *store*.
+```js
+const actions = {
+  async fetchTodos({ commit }) {
+    // Código anterior
+  },
+  async addTodo({ commit }, title) {
+    // Código anterior
+  },
+  async deleteTodo({ commit }, id) {
+    // Código anterior
+  },
+  async filterTodos({ commit }, event) {
+    // Creando esta constante obtenemos un número de tareas según el valor que se
+    // selecciona en el select del html de FilterTodos. 
+    const limit = parseInt(event.target.options[event.target.selectedIndex].innerText);
+
+    const response = 
+      await axios.get(`https://jsonplaceholder.typicode.com/todos?_limit=${limit}`);
+
+    commit('setTodos', response.data);
+  }
+};
+
+const mutations = {
+  // Utilizamos setTodos puesto que recibe un número determinado de tareas.
+  setTodos: (state, todos) => (state.todos = todos),
+  addTodo: (state, todo) => state.todos.unshift(todo),
+  removeTodo: (state, id) => state.todos = state.todos.filter(todo => todo.id !== id),
+};
+```
+
+- Luego en nuestro componenete de `FilterTodos` llamaremos a esta acción:
+```html
+<template>
+  <div>
+    Filtrar tareas
+    <select @change="filterTodos"> <!-- Cuando cambia el select lanza la acción pasada como método -->
+      <option value="100">100</option>
+      <option value="50">50</option>
+      <option value="20">20</option>
+      <option value="10">10</option>
+      <option value="5">5</option>
+    </select>
+  </div>
+</template>
+
+<script>
+import { mapActions } from 'vuex';
+export default {
+  name: "FilterTodos",
+  methods: mapActions(['filterTodos'])
+}
+</script>
+```
+
+## Actualizar una tarea como completada o no
+
+- El siguiente paso es ver como actualizar el estado de una tarea, pasándola a commpletada si no lo está, o poniendo su estado como tarea pendiente. Lo haremos con un doble click sobre la tarea.
+
+- Creamos una leyenda en nuestro componente de `Todos.vue` donde mostrar qué tarea está completada y cual no con un color de fondo en la tarea distinto para cada caso, naranja para la no completada y verde para la completada:
+
+```html
+<template>
+  <div>
+    <h3>To-Dos</h3>
+    <div class="legend">
+      <span>
+        <span class="complete-box"></span> = Completada
+      </span>
+      <span>
+        <span class="incomplete-box"></span> = Pendiente
+      </span>
+    </div>
+    <div class="todos">
+      <div v-for="todo in allTodos" :key="todo.id" class="todo">
+        {{todo.title}}
+        <i @click="deleteTodo(todo.id)" class="fas fa-trash-alt"></i>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapGetters, mapActions } from 'vuex';
+
+export default {
+  name: 'Todos',
+  methods: {
+    ...mapActions(['fetchTodos', 'deleteTodo'])
+    },
+  computed: mapGetters(['allTodos']),
+  created() {
+    this.fetchTodos();
+  }
+
+}
+</script>
+
+<style scoped>
+.todos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1rem;
+}
+.todo {
+  border: 1px solid #046c3d68;
+  background: #24b675;
+  padding: 1rem;
+  border-radius: 5px;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+}
+i { 
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: #fff;
+  cursor: pointer;
+}
+.legend {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1rem;
+}
+.complete-box {
+  background-color: #24b675;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+}
+.incomplete-box {
+  background: orange;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+}
+
+@media (min-width: 500px) {
+  .todos {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+```
+
+
+
+
