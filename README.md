@@ -1,5 +1,9 @@
 # vuex-todo-manager
 
+## What is this?
+This is the code for the Vuex course. Just follow the steps described at `Notas` files.
+For really noob people, hope you like it!
+
 ## Project setup
 ```
 yarn install
