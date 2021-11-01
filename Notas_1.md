@@ -5,7 +5,7 @@
 
 Vuex es una librería de patrones y un gestor de estados de una aplicación. Se utiliza normalmente con la librería de Vue y es muy similar a redux o Flux, pero más sencillo.
 
-Con vuex dispones de un `Store` centralizado para todos los componentes. Como un 'almacén' donde se guarda el estado de la aplicación. Esto se hace así porque en muchos casos los componentes de una aplicación han de compartir el estado, y además de esta forma tenemos una unica fuente de datos para la totalidad de la aplicación. Con esto nos ahorramos el tener que estar pasando props de padres a hijos o emitiendo eventos de los hijos a los padres, a través de muchos componentes:
+Con vuex dispones de un `Store` centralizado para todos los componentes. Como un 'almacén' donde se guarda el estado de la aplicación. Esto se hace así porque en muchos casos los componentes de una aplicación han de compartir el estado, y además de esta forma tenemos una única fuente de datos para la totalidad de la aplicación. Con esto nos ahorramos el tener que estar pasando props de padres a hijos o emitiendo eventos de los hijos a los padres, a través de muchos componentes:
 
 ![](notes-images/events-props.png) ![](notes-images/one-place.png)
 
@@ -31,7 +31,7 @@ Todo esto hace surgir un problema, si diversos componentes pueden mutar el estad
 
 Veamos un ejemplo simple.
 
-### Es similar a una instancia de Vuex
+### Es similar a una instancia de Vuex
 
 De la misma forma que creamos una instancia de Vue, podemos crear un nuevo *Store* con `vuex.store`:
 
