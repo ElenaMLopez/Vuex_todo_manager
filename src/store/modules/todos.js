@@ -10,6 +10,8 @@ const getters = {
 
 const actions = {
   async fetchTodos({ commit }) {
+    // Lo ideal es que todas las llamadas se gestionen en otro sitio y de otra forma
+    // usando variables de entorno y demás. Se verá en apartados más adelantados
     const response = await axios.get(
       'https://jsonplaceholder.typicode.com/posts'
     );
